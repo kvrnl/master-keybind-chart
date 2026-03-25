@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Master Keybind Chart</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/effects.css">
+  <link rel="stylesheet" href="css/features.css">
+</head>
+<body>
+  <div class="top-bar">
+    <button type="button" class="master-clear" id="master-clear-btn" title="Clear all keybinds">Master Clear</button>
+    <div class="theme-wrap">
+      <label for="theme-select" class="visually-hidden">Color theme</label>
+      <select id="theme-select" class="theme-select" title="Color theme">
+        <option value="default">Default</option>
+        <option value="light">Light</option>
+        <option value="crimson">Crimson</option>
+        <option value="ocean">Ocean</option>
+        <option value="forest">Forest</option>
+        <option value="violet">Violet</option>
+        <option value="amber">Amber</option>
+        <option value="steel">Steel Blue</option>
+        <option value="midnight">Midnight</option>
+      </select>
+    </div>
+    <div class="effect-wrap">
+      <label for="effect-select" class="visually-hidden">Effects</label>
+      <select id="effect-select" class="effect-select" title="Effects">
+        <option value="none">Effect: None</option>
+        <option value="pulse">Pulse</option>
+        <option value="wave">Wave</option>
+        <option value="breathe">Breathe</option>
+        <option value="rainbow">Rainbow</option>
+      </select>
+    </div>
+    <h1 class="top-title">Master Keybind Chart</h1>
+    <div class="top-actions">
+      <span id="save-status" class="save-status" aria-live="polite"></span>
+      <div class="profile-wrap">
+        <label for="profile-select" class="visually-hidden">Profile</label>
+        <select id="profile-select" class="profile-select" title="Profile">
+          <option value="Default">Default</option>
+          <option value="__new__">+ New profile&hellip;</option>
+        </select>
+      </div>
+      <div class="size-control" aria-label="Keyboard size">
+        <button type="button" id="size-minus" title="Smaller">&minus;</button>
+        <button type="button" id="size-plus" title="Larger">+</button>
+      </div>
+      <div class="search-wrap">
+        <input type="text" id="search-input" placeholder="Search keybinds..." autocomplete="off">
+        <button type="button" class="search-clear" id="search-clear">&times;</button>
+      </div>
+      <div class="tools-wrap">
+        <button type="button" class="tools-btn" id="tools-btn">Tools</button>
+        <div class="tools-dropdown" id="tools-dropdown">
+          <button type="button" id="tool-categories">Categories</button>
+          <button type="button" id="tool-heatmap">Heatmap</button>
+          <button type="button" id="tool-print">Print View</button>
+          <button type="button" id="tool-presets">Presets</button>
+        </div>
+      </div>
+      <button type="button" id="import-btn">Import</button>
+      <button type="button" id="export-btn">Export</button>
+      <button type="button" id="share-btn" title="Copy share link">Share</button>
+    </div>
+  </div>
+
+  <input type="file" id="import-file" accept=".json,application/json" style="display: none">
+
+  <div class="key-context-menu" id="key-context-menu" role="menu">
+    <button type="button" id="key-context-clear" role="menuitem">Clear this key</button>
+  </div>
+
+  <div class="clear-confirm" id="clear-confirm" role="dialog" aria-label="Confirm clear">
+    <p>Clear all keybinds?</p>
+    <div class="clear-confirm-btns">
+      <button type="button" class="clear-no" id="clear-no">No</button>
+      <button type="button" class="clear-yes" id="clear-yes">Yes</button>
+    </div>
+  </div>
+
+  <div class="layer-bar" id="layer-bar">
+    <span class="layer-label">Layer:</span>
+    <button type="button" class="layer-btn active" data-layer="base">Base</button>
+    <button type="button" class="layer-btn" data-layer="ctrl">Ctrl+</button>
+    <button type="button" class="layer-btn" data-layer="alt">Alt+</button>
+    <button type="button" class="layer-btn" data-layer="shift">Shift+</button>
+    <span class="layer-indicator" id="layer-indicator"></span>
+  </div>
+
+  <div class="keyboard-wrapper">
+    <div class="keyboard" id="main-keyboard"></div>
+    <div class="keyboard" id="nav-keyboard"></div>
+    <div class="keyboard" id="numpad-keyboard"></div>
+  </div>
+
+  <div class="print-legend" id="print-legend"></div>
+
+  <!-- Tooltip element (reused, repositioned on hover) -->
+  <div class="key-tooltip" id="key-tooltip">
+    <div class="tooltip-label" id="tooltip-label"></div>
+    <div class="tooltip-desc" id="tooltip-desc"></div>
+    <div class="tooltip-category" id="tooltip-category"></div>
+  </div>
+
+  <!-- Category manager modal -->
+  <div class="category-overlay" id="category-overlay"></div>
+  <div class="category-manager" id="category-manager">
+    <button type="button" class="cat-close" id="cat-close">&times;</button>
+    <h3>Categories</h3>
+    <div class="cat-list" id="cat-list"></div>
+    <div class="cat-add-row">
+      <input type="color" id="cat-add-color" value="#4CAF50">
+      <input type="text" id="cat-add-name" placeholder="New category name...">
+      <button type="button" id="cat-add-btn">Add</button>
+    </div>
+  </div>
+
+  <!-- Print mode exit button -->
+  <button type="button" id="print-exit">Exit Print View</button>
+
+  <!-- Preset modal -->
+  <div class="category-overlay" id="preset-overlay"></div>
+  <div class="category-manager" id="preset-manager" style="min-width:360px">
+    <button type="button" class="cat-close" id="preset-close">&times;</button>
+    <h3>Load Preset</h3>
+    <div class="cat-list" id="preset-list"></div>
+  </div>
+
+  <!-- JS: load order matters (data model first, app last) -->
+  <script src="js/data.js"></script>
+  <script src="js/keyboard.js"></script>
+  <script src="js/profiles.js"></script>
+  <script src="js/themes.js"></script>
+  <script src="js/layers.js"></script>
+  <script src="js/categories.js"></script>
+  <script src="js/conflicts.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/dragdrop.js"></script>
+  <script src="js/heatmap.js"></script>
+  <script src="js/print.js"></script>
+  <script src="js/tooltips.js"></script>
+  <script src="js/presets.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

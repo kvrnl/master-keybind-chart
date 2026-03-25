@@ -1,0 +1,510 @@
+/* ===== BASE LAYOUT & KEYBOARD STYLES ===== */
+
+:root {
+  --key-u: 92px;
+  --key-gap: 15px;
+  --key-padding-v: 11px;
+  --key-padding-h: 13px;
+  --key-cap-font: 15px;
+  --key-cap-margin: 3px;
+  --keybind-font: 15.5px;
+  --keybind-max-height: 2.6em;
+  --key-bg: #3a3a3a;
+  --key-border: #555;
+  --key-text: #f0f0f0;
+  --keybind-text: #e8e8e8;
+  --key-hover: #4a4a4a;
+  --key-edit: #5a5a8a;
+  --bg: #1e1e1e;
+  --header: #2a2a2a;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--key-text);
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ===== TOP BAR ===== */
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 20px;
+  margin-bottom: 16px;
+  background: var(--header);
+  border-radius: 8px;
+  border: 1px solid var(--key-border);
+}
+
+.top-bar .top-title {
+  flex: 1;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.top-bar .top-actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.top-bar .top-actions button {
+  padding: 8px 16px;
+  font-size: 14px;
+  background: var(--key-bg);
+  border: 1px solid var(--key-border);
+  color: var(--key-text);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.top-bar .top-actions button:hover {
+  background: var(--key-hover);
+}
+
+.top-bar .master-clear {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  font-size: 13px;
+  background: var(--key-bg);
+  border: 1px solid var(--key-border);
+  color: var(--key-text);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.top-bar .master-clear:hover {
+  background: var(--key-hover);
+}
+
+/* ===== DROPDOWNS (shared) ===== */
+
+.top-bar .theme-wrap,
+.top-bar .effect-wrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.top-bar .theme-select,
+.top-bar .effect-select,
+.top-bar .profile-select {
+  padding: 8px 12px;
+  padding-right: 28px;
+  font-size: 13px;
+  background: var(--key-bg);
+  border: 1px solid var(--key-border);
+  color: var(--key-text);
+  border-radius: 6px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23aaa' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.top-bar .theme-select:hover,
+.top-bar .effect-select:hover,
+.top-bar .profile-select:hover {
+  background-color: var(--key-hover);
+  border-color: #666;
+}
+
+.top-bar .theme-select:focus,
+.top-bar .effect-select:focus,
+.top-bar .profile-select:focus {
+  outline: none;
+  border-color: var(--key-edit);
+  box-shadow: 0 0 0 2px rgba(90, 90, 138, 0.3);
+}
+
+.top-bar .profile-wrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* ===== SIZE CONTROLS ===== */
+
+.size-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.size-control button {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
+  background: var(--key-bg);
+  border: 1px solid var(--key-border);
+  color: var(--key-text);
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.size-control button:hover:not(:disabled) {
+  background: var(--key-hover);
+  border-color: #666;
+}
+
+.size-control button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ===== SAVE STATUS ===== */
+
+.save-status {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  color: var(--keybind-text);
+  min-width: 80px;
+}
+
+.save-status.saved { color: #7cb87c; }
+
+/* ===== KEYBOARD WRAPPER ===== */
+
+.keyboard-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: var(--wrapper-gap, 33px);
+  flex-wrap: wrap;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--key-gap);
+  padding: var(--keyboard-padding, 29px);
+  background: var(--header);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+#main-keyboard {
+  width: calc(16.5 * var(--key-u) + 7 * var(--key-gap));
+  min-width: 0;
+  box-sizing: content-box;
+}
+
+#main-keyboard .keyboard-row {
+  width: 100%;
+}
+
+#main-keyboard .key.key-grow {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+/* ===== KEYBOARD ROWS ===== */
+
+.keyboard-row {
+  display: flex;
+  gap: var(--key-gap);
+  justify-content: flex-start;
+  align-items: stretch;
+}
+
+.keyboard-row.spacer { margin-left: 0; }
+
+.keyboard-row .row-flex-gap {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: none;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  pointer-events: none;
+  cursor: default;
+  padding: 0;
+}
+
+.keyboard-row .row-flex-gap .key-cap,
+.keyboard-row .row-flex-gap .keybind { display: none; }
+
+/* ===== KEY STYLES ===== */
+
+.key {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: var(--key-u);
+  min-width: var(--key-u);
+  height: var(--key-u);
+  min-height: var(--key-u);
+  padding: var(--key-padding-v) var(--key-padding-h);
+  overflow: hidden;
+  background: linear-gradient(180deg, #444 0%, var(--key-bg) 30%, #2a2a2a 100%);
+  border: 1px solid var(--key-border);
+  border-radius: 3px;
+  cursor: text;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 2px 0 rgba(0,0,0,0.4), 0 1px 1px rgba(0,0,0,0.2);
+}
+
+.key:hover {
+  background: linear-gradient(180deg, #4a4a4a 0%, var(--key-hover) 30%, #333 100%);
+  border-color: #666;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.1) inset, 0 2px 0 rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.25);
+}
+
+.key.editing {
+  background: linear-gradient(180deg, #6a6a9a 0%, var(--key-edit) 30%, #4a4a6a 100%);
+  border-color: #7a7ab0;
+  outline: 2px solid #8a8ac0;
+  outline-offset: 1px;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.15) inset, 0 0 0 1px #8a8ac0, 0 2px 6px rgba(122,122,176,0.35);
+}
+
+.key-cap {
+  font-size: var(--key-cap-font);
+  font-weight: 700;
+  color: var(--key-text);
+  margin-bottom: var(--key-cap-margin);
+  pointer-events: none;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+}
+
+.keybind {
+  font-size: var(--keybind-font);
+  color: var(--keybind-text);
+  text-align: center;
+  width: 100%;
+  height: var(--keybind-max-height);
+  max-height: var(--keybind-max-height);
+  line-height: 1.3;
+  outline: none;
+  font-weight: 600;
+  text-shadow: 0 0 1px rgba(0,0,0,0.8), 0 1px 2px rgba(0,0,0,0.5);
+  overflow: hidden !important;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  flex-shrink: 0;
+  overscroll-behavior: none;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* ===== KEY CLEAR BUTTON ===== */
+
+.key-clear-btn {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 700;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--key-text);
+  cursor: pointer;
+  opacity: 0.45;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.key-clear-btn:hover {
+  opacity: 0.9;
+  background: transparent;
+}
+
+.key-spacer .key-clear-btn,
+.key.key-spacer .key-clear-btn { display: none; }
+
+/* ===== KEY SIZE VARIANTS ===== */
+
+.key.u1 { width: var(--key-u); min-width: var(--key-u); }
+.key.u1-25 { width: calc(1.25 * var(--key-u)); min-width: calc(1.25 * var(--key-u)); }
+.key.u1-5 { width: calc(1.5 * var(--key-u)); min-width: calc(1.5 * var(--key-u)); }
+.key.u1-75 { width: calc(1.75 * var(--key-u)); min-width: calc(1.75 * var(--key-u)); }
+.key.u2 { width: calc(2 * var(--key-u)); min-width: calc(2 * var(--key-u)); }
+.key.u2-25 { width: calc(2.25 * var(--key-u)); min-width: calc(2.25 * var(--key-u)); }
+.key.u2-75 { width: calc(2.75 * var(--key-u)); min-width: calc(2.75 * var(--key-u)); }
+.key.u6-25 { width: calc(6.25 * var(--key-u)); min-width: calc(6.25 * var(--key-u)); }
+.key.u6-5 { width: calc(6.5 * var(--key-u)); min-width: calc(6.5 * var(--key-u)); }
+.key.wide-1 { width: calc(1 * var(--key-u)); min-width: var(--key-u); }
+.key.wide-2 { width: calc(1.5 * var(--key-u)); min-width: calc(1.5 * var(--key-u)); }
+
+.key.key-f-row {
+  min-width: var(--key-u);
+  width: var(--key-u);
+}
+
+.key.key-f-row.u1-5 {
+  min-width: calc(1.5 * var(--key-u));
+  width: calc(1.5 * var(--key-u));
+}
+
+/* ===== SPACER KEYS ===== */
+
+.key-spacer {
+  cursor: default;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.key-spacer .key-cap { visibility: hidden; }
+
+/* ===== NAV CLUSTER ===== */
+
+#nav-keyboard {
+  align-self: flex-end;
+}
+
+/* ===== NUMPAD ===== */
+
+#numpad-keyboard {
+  align-self: flex-end;
+}
+
+.key.key-h2 {
+  height: calc(2 * var(--key-u) + var(--key-gap));
+  min-height: calc(2 * var(--key-u) + var(--key-gap));
+}
+
+/* ===== CONTEXT MENU ===== */
+
+.key-context-menu {
+  position: fixed;
+  z-index: 200;
+  background: var(--header);
+  border: 1px solid var(--key-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  padding: 4px 0;
+  min-width: 140px;
+  display: none;
+}
+
+.key-context-menu.visible {
+  display: block;
+}
+
+.key-context-menu button {
+  width: 100%;
+  padding: 8px 14px;
+  font-size: 13px;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--key-text);
+  cursor: pointer;
+}
+
+.key-context-menu button:hover {
+  background: var(--key-hover);
+}
+
+/* ===== CLEAR CONFIRM DIALOG ===== */
+
+.clear-confirm {
+  position: fixed;
+  top: 48px;
+  left: 12px;
+  z-index: 100;
+  background: var(--header);
+  border: 1px solid var(--key-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--key-text);
+  display: none;
+}
+
+.clear-confirm.visible {
+  display: block;
+}
+
+.clear-confirm p {
+  margin: 0 0 12px 0;
+}
+
+.clear-confirm-btns {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.clear-confirm-btns button {
+  padding: 6px 14px;
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid var(--key-border);
+}
+
+.clear-confirm-btns .clear-yes {
+  background: #5a7a5a;
+  color: #fff;
+  border-color: #4a6a4a;
+}
+
+.clear-confirm-btns .clear-yes:hover {
+  background: #6a8a6a;
+}
+
+.clear-confirm-btns .clear-no {
+  background: var(--key-bg);
+  color: var(--key-text);
+}
+
+.clear-confirm-btns .clear-no:hover {
+  background: var(--key-hover);
+}
+
+/* ===== UTILITY ===== */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
