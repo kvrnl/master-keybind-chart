@@ -2,7 +2,8 @@
 
 // ===== Core keybind read/write (layer-aware) =====
 
-var _profileData = null; // Cached full profile data object
+var _profileData = null;
+var _selectedKeyCode = null;
 
 function getProfileData() {
   if (!_profileData) _profileData = loadFromStorage();
@@ -14,7 +15,6 @@ function setProfileData(data) {
 }
 
 function getCurrentKeybinds() {
-  // Read DOM state back into the profile data for the active layer
   var data = getProfileData();
   document.querySelectorAll('.key[data-key]').forEach(function(keyEl) {
     var code = keyEl.dataset.key;
@@ -59,16 +59,18 @@ function clearOneKey(keyEl) {
     }
     saveToStorage(getCurrentKeybinds());
     applyCategoryColors();
+    updateCategoryLegend();
     detectConflicts();
+    if (code === _selectedKeyCode) openKeyEditor(code);
   }
 }
 
 // ===== Size controls =====
 
-var SIZE_MIN = 60;
-var SIZE_MAX = 115;
+var SIZE_MIN = 50;
+var SIZE_MAX = 100;
 var SIZE_STEP = 4;
-var SIZE_DEFAULT = 92;
+var SIZE_DEFAULT = 80;
 
 function getStoredSize() {
   var n = parseInt(localStorage.getItem(SIZE_STORAGE_KEY), 10);
@@ -78,15 +80,15 @@ function getStoredSize() {
 function applySize(keyU) {
   keyU = Math.max(SIZE_MIN, Math.min(SIZE_MAX, keyU));
   var scale = keyU / SIZE_DEFAULT;
-  var gap = Math.round(scale * 15 * 10) / 10;
-  var wrapperGap = Math.round(scale * 33);
-  var padding = Math.round(scale * 29);
-  var keyPadV = Math.round(scale * 11);
-  var keyPadH = Math.round(scale * 13);
-  var keyCapFont = Math.round(scale * 15);
-  var keyCapMargin = Math.round(scale * 3);
-  var keybindFont = Math.round(scale * 15.5 * 10) / 10;
-  var keybindMaxHeight = Math.round(scale * 15.5 * 1.3 * 2 * 10) / 10;
+  var gap = Math.round(scale * 12 * 10) / 10;
+  var wrapperGap = Math.round(scale * 24);
+  var padding = Math.round(scale * 20);
+  var keyPadV = Math.round(scale * 8);
+  var keyPadH = Math.round(scale * 10);
+  var keyCapFont = Math.round(scale * 13);
+  var keyCapMargin = Math.round(scale * 2);
+  var keybindFont = Math.round(scale * 13 * 10) / 10;
+  var keybindMaxHeight = Math.round(scale * 13 * 1.3 * 2 * 10) / 10;
   document.documentElement.style.setProperty('--key-u', keyU + 'px');
   document.documentElement.style.setProperty('--key-gap', gap + 'px');
   document.documentElement.style.setProperty('--wrapper-gap', wrapperGap + 'px');
@@ -99,11 +101,113 @@ function applySize(keyU) {
   document.documentElement.style.setProperty('--keybind-max-height', keybindMaxHeight + 'px');
   document.getElementById('size-minus').disabled = keyU <= SIZE_MIN;
   document.getElementById('size-plus').disabled = keyU >= SIZE_MAX;
+  // Update size label
+  var sizeVal = document.getElementById('size-value');
+  if (sizeVal) sizeVal.textContent = Math.round((keyU / SIZE_DEFAULT) * 100) + '%';
   localStorage.setItem(SIZE_STORAGE_KEY, String(keyU));
 }
 
 function initSize() {
   applySize(getStoredSize());
+}
+
+// ===== Key editor panel =====
+
+function openKeyEditor(code) {
+  var editorBody = document.getElementById('editor-body');
+  var editorTitle = document.getElementById('editor-key-name');
+  var labelInput = document.getElementById('editor-label');
+  var descInput = document.getElementById('editor-desc');
+  var catSelect = document.getElementById('editor-category');
+
+  if (!code) {
+    editorBody.style.display = 'none';
+    editorTitle.textContent = 'Click a key to edit';
+    _selectedKeyCode = null;
+    // Remove selected state from all keys
+    document.querySelectorAll('.key.selected').forEach(function(k) { k.classList.remove('selected'); });
+    return;
+  }
+
+  _selectedKeyCode = code;
+  var data = getProfileData();
+  var entry = getKeyEntry(data, currentLayer, code);
+
+  // Find the key cap label for this code
+  var keyEl = document.querySelector('.key[data-key="' + code + '"]');
+  var capLabel = keyEl ? keyEl.querySelector('.key-cap').textContent : code;
+
+  editorTitle.textContent = capLabel + ' Key';
+  editorBody.style.display = '';
+  labelInput.value = entry.label || '';
+  descInput.value = entry.description || '';
+
+  // Populate category dropdown
+  var cats = data.categories || {};
+  catSelect.innerHTML = '<option value="">None</option>';
+  Object.keys(cats).forEach(function(name) {
+    var opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = name;
+    if (entry.category === name) opt.selected = true;
+    catSelect.appendChild(opt);
+  });
+
+  // Highlight selected key
+  document.querySelectorAll('.key.selected').forEach(function(k) { k.classList.remove('selected'); });
+  if (keyEl) keyEl.classList.add('selected');
+}
+
+function syncEditorToData() {
+  if (!_selectedKeyCode) return;
+  var data = getProfileData();
+  var entry = getKeyEntry(data, currentLayer, _selectedKeyCode);
+  var labelInput = document.getElementById('editor-label');
+  var descInput = document.getElementById('editor-desc');
+  var catSelect = document.getElementById('editor-category');
+
+  entry.label = (labelInput.value || '').slice(0, KEYBIND_MAX_CHARS);
+  entry.description = descInput.value || '';
+  entry.category = catSelect.value || null;
+  setKeyEntry(data, currentLayer, _selectedKeyCode, entry);
+
+  // Sync label back to key on keyboard
+  var keyEl = document.querySelector('.key[data-key="' + _selectedKeyCode + '"]');
+  if (keyEl) {
+    var keybindEl = keyEl.querySelector('.keybind');
+    if (keybindEl) keybindEl.textContent = entry.label;
+  }
+
+  saveToStorage(getCurrentKeybinds());
+  applyCategoryColors();
+  updateCategoryLegend();
+  detectConflicts();
+}
+
+// ===== Category legend =====
+
+function updateCategoryLegend() {
+  var legend = document.getElementById('category-legend');
+  if (!legend) return;
+  legend.innerHTML = '';
+
+  var data = getProfileData();
+  var cats = data.categories || {};
+  var catNames = Object.keys(cats);
+  if (catNames.length === 0) return;
+
+  catNames.forEach(function(name) {
+    var item = document.createElement('div');
+    item.className = 'legend-item';
+    var swatch = document.createElement('span');
+    swatch.className = 'legend-swatch';
+    swatch.style.background = cats[name];
+    var label = document.createElement('span');
+    label.textContent = name;
+    item.appendChild(swatch);
+    item.appendChild(label);
+    legend.appendChild(item);
+  });
 }
 
 // ===== Edit handlers =====
@@ -119,6 +223,11 @@ function setupEditHandlers() {
       keybindEl.closest('.key').classList.remove('editing');
       saveToStorage(getCurrentKeybinds());
       if (typeof detectConflicts === 'function') detectConflicts();
+      // Sync editor if this key is selected
+      var keyEl = keybindEl.closest('.key');
+      if (keyEl && keyEl.dataset.key === _selectedKeyCode) {
+        openKeyEditor(_selectedKeyCode);
+      }
     });
     keybindEl.addEventListener('input', function() {
       var keyEl = keybindEl.closest('.key');
@@ -167,6 +276,9 @@ function importJson(file) {
       var data = ensureV2(raw);
       applyKeybinds(data);
       saveToStorage(getCurrentKeybinds());
+      applyCategoryColors();
+      updateCategoryLegend();
+      detectConflicts();
     } catch (_) {
       alert('Invalid JSON file.');
     }
@@ -174,11 +286,10 @@ function importJson(file) {
   reader.readAsText(file);
 }
 
-// ===== Tools dropdown helper =====
+// ===== Tools dropdown helper (no-op now, sidebar-based) =====
 
 function closeToolsDropdown() {
-  var dropdown = document.getElementById('tools-dropdown');
-  if (dropdown) dropdown.classList.remove('visible');
+  // Legacy compat — tools are now in sidebar, nothing to close
 }
 
 // ===== Init =====
@@ -200,9 +311,47 @@ function closeToolsDropdown() {
   refreshProfileDropdown();
   setupEditHandlers();
 
+  // ===== Sidebar toggle =====
+  (function initSidebar() {
+    var toggle = document.getElementById('sidebar-toggle');
+    var sidebar = document.getElementById('sidebar');
+    var saved = localStorage.getItem('masterKeybindChartSidebarCollapsed');
+    if (saved === 'true') sidebar.classList.add('collapsed');
+
+    toggle.addEventListener('click', function() {
+      sidebar.classList.toggle('collapsed');
+      localStorage.setItem('masterKeybindChartSidebarCollapsed', sidebar.classList.contains('collapsed'));
+    });
+  })();
+
+  // ===== Key editor panel =====
+  (function initKeyEditor() {
+    var labelInput = document.getElementById('editor-label');
+    var descInput = document.getElementById('editor-desc');
+    var catSelect = document.getElementById('editor-category');
+    var closeBtn = document.getElementById('editor-close');
+
+    // Click a key to select and open editor
+    document.querySelector('.keyboard-wrapper').addEventListener('click', function(e) {
+      // Don't interfere with clear button
+      if (e.target.closest('.key-clear-btn')) return;
+      var keyEl = e.target.closest('.key[data-key]');
+      if (!keyEl || keyEl.classList.contains('key-spacer')) return;
+      openKeyEditor(keyEl.dataset.key);
+    });
+
+    // Editor inputs sync to data
+    labelInput.addEventListener('input', syncEditorToData);
+    descInput.addEventListener('input', syncEditorToData);
+    catSelect.addEventListener('change', syncEditorToData);
+
+    closeBtn.addEventListener('click', function() {
+      openKeyEditor(null);
+    });
+  })();
+
   // ===== Event listeners =====
 
-  // Page restore
   window.addEventListener('pageshow', function(ev) {
     if (!ev.persisted) return;
     initSize();
@@ -210,31 +359,19 @@ function closeToolsDropdown() {
     initEffect();
   });
 
-  // Save on visibility change
   document.addEventListener('visibilitychange', function() {
     if (document.visibilityState === 'hidden') saveToStorage(getCurrentKeybinds());
   });
 
-  // Save before unload
   window.addEventListener('beforeunload', function() { saveToStorage(getCurrentKeybinds()); });
 
-  // Theme select
-  document.getElementById('theme-select').addEventListener('change', function() {
-    applyTheme(this.value);
-  });
-
-  // Effect select
-  document.getElementById('effect-select').addEventListener('change', function() {
-    applyEffect(this.value);
-  });
+  // Theme & effect selects
+  document.getElementById('theme-select').addEventListener('change', function() { applyTheme(this.value); });
+  document.getElementById('effect-select').addEventListener('change', function() { applyEffect(this.value); });
 
   // Size controls
-  document.getElementById('size-minus').addEventListener('click', function() {
-    applySize(getStoredSize() - SIZE_STEP);
-  });
-  document.getElementById('size-plus').addEventListener('click', function() {
-    applySize(getStoredSize() + SIZE_STEP);
-  });
+  document.getElementById('size-minus').addEventListener('click', function() { applySize(getStoredSize() - SIZE_STEP); });
+  document.getElementById('size-plus').addEventListener('click', function() { applySize(getStoredSize() + SIZE_STEP); });
 
   // Profile select
   document.getElementById('profile-select').addEventListener('change', function() {
@@ -248,7 +385,7 @@ function closeToolsDropdown() {
     }
   });
 
-  // Key clear buttons (delegated to all keyboards)
+  // Key clear buttons (delegated)
   document.querySelector('.keyboard-wrapper').addEventListener('click', function(e) {
     var btn = e.target.closest('.key-clear-btn');
     if (btn) {
@@ -259,7 +396,7 @@ function closeToolsDropdown() {
     }
   });
 
-  // Context menu (global _contextKeyEl used by categories & tooltips)
+  // Context menu
   (function keyContextMenu() {
     var menu = document.getElementById('key-context-menu');
     var clearItem = document.getElementById('key-context-clear');
@@ -298,7 +435,11 @@ function closeToolsDropdown() {
       data.layers[currentLayer] = {};
       applyKeybinds(data);
       saveToStorage(getCurrentKeybinds());
+      applyCategoryColors();
+      updateCategoryLegend();
+      detectConflicts();
       showSaveStatus('saved');
+      openKeyEditor(null);
     });
     document.getElementById('clear-no').addEventListener('click', function() {
       confirmEl.classList.remove('visible');
@@ -329,26 +470,6 @@ function closeToolsDropdown() {
     });
   });
 
-  // Tools dropdown
-  (function initToolsDropdown() {
-    var btn = document.getElementById('tools-btn');
-    var dropdown = document.getElementById('tools-dropdown');
-    if (!btn || !dropdown) return;
-
-    btn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      dropdown.classList.toggle('visible');
-    });
-
-    document.addEventListener('click', function() {
-      dropdown.classList.remove('visible');
-    });
-
-    dropdown.addEventListener('click', function(e) {
-      e.stopPropagation();
-    });
-  })();
-
   // Init all features
   initLayers();
   initCategories();
@@ -359,9 +480,10 @@ function closeToolsDropdown() {
   initPrint();
   initPresets();
 
-  // Apply category colors and detect conflicts on first load
+  // Apply feature visuals on first load
   applyCategoryColors();
   refreshCategoryContextMenu();
+  updateCategoryLegend();
   detectConflicts();
 
   // Load from share URL
@@ -374,6 +496,8 @@ function closeToolsDropdown() {
       var data = ensureV2(raw);
       applyKeybinds(data);
       saveToStorage(getCurrentKeybinds());
+      applyCategoryColors();
+      updateCategoryLegend();
       if (history.replaceState) history.replaceState(null, '', location.pathname);
     } catch (_) {}
   })();

@@ -69,7 +69,9 @@ function switchProfile(name) {
   // Refresh feature visuals
   if (typeof applyCategoryColors === 'function') applyCategoryColors();
   if (typeof refreshCategoryContextMenu === 'function') refreshCategoryContextMenu();
+  if (typeof updateCategoryLegend === 'function') updateCategoryLegend();
   if (typeof detectConflicts === 'function') detectConflicts();
+  if (typeof openKeyEditor === 'function') openKeyEditor(null);
 }
 
 function createProfile(name) {

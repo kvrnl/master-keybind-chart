@@ -10,34 +10,23 @@
   <link rel="stylesheet" href="css/features.css">
 </head>
 <body>
-  <div class="top-bar">
-    <button type="button" class="master-clear" id="master-clear-btn" title="Clear all keybinds">Master Clear</button>
-    <div class="theme-wrap">
-      <label for="theme-select" class="visually-hidden">Color theme</label>
-      <select id="theme-select" class="theme-select" title="Color theme">
-        <option value="default">Default</option>
-        <option value="light">Light</option>
-        <option value="crimson">Crimson</option>
-        <option value="ocean">Ocean</option>
-        <option value="forest">Forest</option>
-        <option value="violet">Violet</option>
-        <option value="amber">Amber</option>
-        <option value="steel">Steel Blue</option>
-        <option value="midnight">Midnight</option>
-      </select>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="header-left">
+      <button type="button" class="sidebar-toggle" id="sidebar-toggle" title="Toggle sidebar">
+        <span class="hamburger"></span>
+      </button>
+      <h1 class="header-title">Master Keybind Chart</h1>
     </div>
-    <div class="effect-wrap">
-      <label for="effect-select" class="visually-hidden">Effects</label>
-      <select id="effect-select" class="effect-select" title="Effects">
-        <option value="none">Effect: None</option>
-        <option value="pulse">Pulse</option>
-        <option value="wave">Wave</option>
-        <option value="breathe">Breathe</option>
-        <option value="rainbow">Rainbow</option>
-      </select>
+    <div class="header-center">
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8.5" cy="8.5" r="5.5"/><line x1="13" y1="13" x2="18" y2="18"/></svg>
+        <input type="text" id="search-input" placeholder="Search keybinds..." autocomplete="off">
+        <button type="button" class="search-clear" id="search-clear">&times;</button>
+      </div>
     </div>
-    <h1 class="top-title">Master Keybind Chart</h1>
-    <div class="top-actions">
+    <div class="header-right">
       <span id="save-status" class="save-status" aria-live="polite"></span>
       <div class="profile-wrap">
         <label for="profile-select" class="visually-hidden">Profile</label>
@@ -46,29 +35,157 @@
           <option value="__new__">+ New profile&hellip;</option>
         </select>
       </div>
-      <div class="size-control" aria-label="Keyboard size">
-        <button type="button" id="size-minus" title="Smaller">&minus;</button>
-        <button type="button" id="size-plus" title="Larger">+</button>
-      </div>
-      <div class="search-wrap">
-        <input type="text" id="search-input" placeholder="Search keybinds..." autocomplete="off">
-        <button type="button" class="search-clear" id="search-clear">&times;</button>
-      </div>
-      <div class="tools-wrap">
-        <button type="button" class="tools-btn" id="tools-btn">Tools</button>
-        <div class="tools-dropdown" id="tools-dropdown">
-          <button type="button" id="tool-categories">Categories</button>
-          <button type="button" id="tool-heatmap">Heatmap</button>
-          <button type="button" id="tool-print">Print View</button>
-          <button type="button" id="tool-presets">Presets</button>
+    </div>
+  </header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="app-layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+      <nav class="sidebar-nav">
+
+        <!-- Layers -->
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Layers</div>
+          <div class="layer-bar" id="layer-bar">
+            <button type="button" class="layer-btn active" data-layer="base">Base</button>
+            <button type="button" class="layer-btn" data-layer="ctrl">Ctrl+</button>
+            <button type="button" class="layer-btn" data-layer="alt">Alt+</button>
+            <button type="button" class="layer-btn" data-layer="shift">Shift+</button>
+          </div>
+          <span class="layer-indicator" id="layer-indicator"></span>
+        </div>
+
+        <!-- Appearance -->
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Appearance</div>
+          <div class="sidebar-field">
+            <label for="theme-select">Theme</label>
+            <select id="theme-select" class="sidebar-select" title="Color theme">
+              <option value="default">Default</option>
+              <option value="light">Light</option>
+              <option value="crimson">Crimson</option>
+              <option value="ocean">Ocean</option>
+              <option value="forest">Forest</option>
+              <option value="violet">Violet</option>
+              <option value="amber">Amber</option>
+              <option value="steel">Steel Blue</option>
+              <option value="midnight">Midnight</option>
+            </select>
+          </div>
+          <div class="sidebar-field">
+            <label for="effect-select">Effect</label>
+            <select id="effect-select" class="sidebar-select" title="Effects">
+              <option value="none">None</option>
+              <option value="pulse">Pulse</option>
+              <option value="wave">Wave</option>
+              <option value="breathe">Breathe</option>
+              <option value="rainbow">Rainbow</option>
+            </select>
+          </div>
+          <div class="sidebar-field">
+            <label>Size</label>
+            <div class="size-control">
+              <button type="button" id="size-minus" title="Smaller">&minus;</button>
+              <span class="size-value" id="size-value">100%</span>
+              <button type="button" id="size-plus" title="Larger">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tools -->
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Tools</div>
+          <button type="button" class="sidebar-action" id="tool-categories">
+            <svg viewBox="0 0 20 20" fill="currentColor"><circle cx="5" cy="5" r="3"/><circle cx="15" cy="5" r="3"/><circle cx="5" cy="15" r="3"/><circle cx="15" cy="15" r="3"/></svg>
+            Categories
+          </button>
+          <button type="button" class="sidebar-action" id="tool-heatmap">
+            <svg viewBox="0 0 20 20" fill="currentColor"><rect x="1" y="12" width="4" height="7" rx="1"/><rect x="8" y="6" width="4" height="13" rx="1"/><rect x="15" y="1" width="4" height="18" rx="1"/></svg>
+            Heatmap
+          </button>
+          <button type="button" class="sidebar-action" id="tool-presets">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 3h14v2H3zM3 9h14v2H3zM3 15h10v2H3z"/></svg>
+            Presets
+          </button>
+          <button type="button" class="sidebar-action" id="tool-print">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M5 1h10v5H5zM2 6h16v8H2zM5 14h10v5H5z"/></svg>
+            Print View
+          </button>
+        </div>
+
+        <!-- Actions -->
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Actions</div>
+          <button type="button" class="sidebar-action" id="import-btn">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 2v10M6 8l4 4 4-4M3 14v3h14v-3"/></svg>
+            Import
+          </button>
+          <button type="button" class="sidebar-action" id="export-btn">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 12V2M6 6l4-4 4 4M3 14v3h14v-3"/></svg>
+            Export
+          </button>
+          <button type="button" class="sidebar-action" id="share-btn">
+            <svg viewBox="0 0 20 20" fill="currentColor"><circle cx="15" cy="4" r="3"/><circle cx="5" cy="10" r="3"/><circle cx="15" cy="16" r="3"/><line x1="7.5" y1="8.8" x2="12.5" y2="5.2" stroke="currentColor" stroke-width="1.5"/><line x1="7.5" y1="11.2" x2="12.5" y2="14.8" stroke="currentColor" stroke-width="1.5"/></svg>
+            Share
+          </button>
+          <div class="sidebar-divider"></div>
+          <button type="button" class="sidebar-action danger" id="master-clear-btn">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M5 4h10l-1 13H6zM3 4h14M8 1h4v3H8z"/></svg>
+            Clear All
+          </button>
+        </div>
+
+      </nav>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content" id="main-content">
+
+      <!-- Key editor panel (shows when a key is selected) -->
+      <div class="key-editor" id="key-editor">
+        <div class="key-editor-header">
+          <span class="key-editor-title" id="editor-key-name">No key selected</span>
+          <button type="button" class="key-editor-close" id="editor-close">&times;</button>
+        </div>
+        <div class="key-editor-body" id="editor-body" style="display:none">
+          <div class="editor-field">
+            <label for="editor-label">Label</label>
+            <input type="text" id="editor-label" placeholder="Keybind name..." maxlength="12" autocomplete="off">
+          </div>
+          <div class="editor-field">
+            <label for="editor-desc">Description</label>
+            <input type="text" id="editor-desc" placeholder="What does this key do?" autocomplete="off">
+          </div>
+          <div class="editor-field">
+            <label for="editor-category">Category</label>
+            <select id="editor-category" class="sidebar-select">
+              <option value="">None</option>
+            </select>
+          </div>
         </div>
       </div>
-      <button type="button" id="import-btn">Import</button>
-      <button type="button" id="export-btn">Export</button>
-      <button type="button" id="share-btn" title="Copy share link">Share</button>
-    </div>
+
+      <!-- Keyboard area -->
+      <div class="keyboard-wrapper">
+        <div class="keyboard" id="main-keyboard"></div>
+        <div class="keyboard-right">
+          <div class="keyboard" id="nav-keyboard"></div>
+          <div class="keyboard" id="numpad-keyboard"></div>
+        </div>
+      </div>
+
+      <!-- Category legend (below keyboard) -->
+      <div class="category-legend" id="category-legend"></div>
+
+      <!-- Print legend (only in print mode) -->
+      <div class="print-legend" id="print-legend"></div>
+
+    </main>
   </div>
 
+  <!-- ===== FLOATING / OVERLAY ELEMENTS ===== -->
   <input type="file" id="import-file" accept=".json,application/json" style="display: none">
 
   <div class="key-context-menu" id="key-context-menu" role="menu">
@@ -83,55 +200,38 @@
     </div>
   </div>
 
-  <div class="layer-bar" id="layer-bar">
-    <span class="layer-label">Layer:</span>
-    <button type="button" class="layer-btn active" data-layer="base">Base</button>
-    <button type="button" class="layer-btn" data-layer="ctrl">Ctrl+</button>
-    <button type="button" class="layer-btn" data-layer="alt">Alt+</button>
-    <button type="button" class="layer-btn" data-layer="shift">Shift+</button>
-    <span class="layer-indicator" id="layer-indicator"></span>
-  </div>
-
-  <div class="keyboard-wrapper">
-    <div class="keyboard" id="main-keyboard"></div>
-    <div class="keyboard" id="nav-keyboard"></div>
-    <div class="keyboard" id="numpad-keyboard"></div>
-  </div>
-
-  <div class="print-legend" id="print-legend"></div>
-
-  <!-- Tooltip element (reused, repositioned on hover) -->
   <div class="key-tooltip" id="key-tooltip">
     <div class="tooltip-label" id="tooltip-label"></div>
     <div class="tooltip-desc" id="tooltip-desc"></div>
     <div class="tooltip-category" id="tooltip-category"></div>
   </div>
 
-  <!-- Category manager modal -->
-  <div class="category-overlay" id="category-overlay"></div>
-  <div class="category-manager" id="category-manager">
-    <button type="button" class="cat-close" id="cat-close">&times;</button>
-    <h3>Categories</h3>
-    <div class="cat-list" id="cat-list"></div>
-    <div class="cat-add-row">
-      <input type="color" id="cat-add-color" value="#4CAF50">
-      <input type="text" id="cat-add-name" placeholder="New category name...">
-      <button type="button" id="cat-add-btn">Add</button>
+  <div class="modal-overlay" id="category-overlay"></div>
+  <div class="modal" id="category-manager">
+    <button type="button" class="modal-close" id="cat-close">&times;</button>
+    <h3 class="modal-title">Categories</h3>
+    <div class="modal-body">
+      <div class="cat-list" id="cat-list"></div>
+      <div class="cat-add-row">
+        <input type="color" id="cat-add-color" value="#4CAF50">
+        <input type="text" id="cat-add-name" placeholder="New category name...">
+        <button type="button" id="cat-add-btn">Add</button>
+      </div>
     </div>
   </div>
 
-  <!-- Print mode exit button -->
-  <button type="button" id="print-exit">Exit Print View</button>
-
-  <!-- Preset modal -->
-  <div class="category-overlay" id="preset-overlay"></div>
-  <div class="category-manager" id="preset-manager" style="min-width:360px">
-    <button type="button" class="cat-close" id="preset-close">&times;</button>
-    <h3>Load Preset</h3>
-    <div class="cat-list" id="preset-list"></div>
+  <div class="modal-overlay" id="preset-overlay"></div>
+  <div class="modal" id="preset-manager">
+    <button type="button" class="modal-close" id="preset-close">&times;</button>
+    <h3 class="modal-title">Load Preset</h3>
+    <div class="modal-body">
+      <div class="cat-list" id="preset-list"></div>
+    </div>
   </div>
 
-  <!-- JS: load order matters (data model first, app last) -->
+  <button type="button" id="print-exit">Exit Print View</button>
+
+  <!-- JS -->
   <script src="js/data.js"></script>
   <script src="js/keyboard.js"></script>
   <script src="js/profiles.js"></script>

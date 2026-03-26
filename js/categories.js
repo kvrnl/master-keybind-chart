@@ -49,6 +49,7 @@ function initCategories() {
     addName.value = '';
     renderCatList();
     refreshCategoryContextMenu();
+    if (typeof updateCategoryLegend === 'function') updateCategoryLegend();
   });
 
   addName.addEventListener('keydown', function(e) {
@@ -74,6 +75,7 @@ function initCategories() {
         saveToStorage(getCurrentKeybinds());
         applyCategoryColors();
         refreshCategoryContextMenu();
+        if (typeof updateCategoryLegend === 'function') updateCategoryLegend();
       });
 
       var nameInput = document.createElement('input');
@@ -99,6 +101,7 @@ function initCategories() {
         renderCatList();
         applyCategoryColors();
         refreshCategoryContextMenu();
+        if (typeof updateCategoryLegend === 'function') updateCategoryLegend();
       });
 
       var deleteBtn = document.createElement('button');
@@ -120,6 +123,7 @@ function initCategories() {
         renderCatList();
         applyCategoryColors();
         refreshCategoryContextMenu();
+        if (typeof updateCategoryLegend === 'function') updateCategoryLegend();
       });
 
       row.appendChild(colorInput);

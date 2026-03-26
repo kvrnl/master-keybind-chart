@@ -1,35 +1,47 @@
 /* ===== LIGHT THEME OVERRIDES ===== */
 
+body.theme-light {
+  --bg: #ececec;
+  --header: #e0e0e0;
+  --sidebar-bg: #e4e4e8;
+  --border-subtle: rgba(0,0,0,0.08);
+  --text-dim: rgba(0,0,0,0.4);
+}
+
 body.theme-light .key {
-  background: linear-gradient(180deg, #eee 0%, var(--key-bg) 30%, #ccc 100%);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.8) inset, 0 1px 2px rgba(0,0,0,0.15);
+  background: linear-gradient(180deg, #f0f0f0 0%, var(--key-bg) 40%, #c8c8c8 100%);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 -1px 0 rgba(0,0,0,0.08) inset, 0 2px 4px rgba(0,0,0,0.1);
 }
 
 body.theme-light .key:hover {
-  background: linear-gradient(180deg, #f0f0f0 0%, var(--key-hover) 30%, #d0d0d0 100%);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 1px 3px rgba(0,0,0,0.2);
+  background: linear-gradient(180deg, #f6f6f6 0%, var(--key-hover) 40%, #d0d0d0 100%);
+  box-shadow: 0 1px 0 rgba(255,255,255,1) inset, 0 4px 8px rgba(0,0,0,0.12);
 }
 
 body.theme-light .key.editing {
-  background: linear-gradient(180deg, #a0b8e0 0%, var(--key-edit) 30%, #8090c0 100%);
+  background: linear-gradient(180deg, #b0c0e0 0%, var(--key-edit) 40%, #8898c0 100%);
   border-color: #6a8ac0;
-  outline: 2px solid #7a9ad0;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.5) inset, 0 0 0 1px #7a9ad0;
 }
 
-body.theme-light .key-cap {
-  text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+body.theme-light .key-cap { text-shadow: 0 1px 0 rgba(255,255,255,0.6); opacity: 0.8; }
+body.theme-light .keybind { text-shadow: 0 0 1px rgba(255,255,255,0.5); }
+
+body.theme-light .header,
+body.theme-light .sidebar {
+  border-color: rgba(0,0,0,0.08);
 }
 
-body.theme-light .keybind {
-  text-shadow: 0 0 1px rgba(255,255,255,0.5);
+body.theme-light .search-wrap input {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.1);
 }
 
-body.theme-light .key-clear-btn {
-  background: transparent;
-  color: var(--key-text);
+body.theme-light .sidebar-select,
+body.theme-light .profile-select {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.1);
 }
 
-body.theme-light .key-clear-btn:hover {
-  background: transparent;
+body.theme-light .sidebar-action:hover {
+  background: rgba(0,0,0,0.05);
 }
