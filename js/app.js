@@ -297,8 +297,6 @@ function closeToolsDropdown() {
 (function init() {
   // Render all keyboard sections
   renderKeyboard('main-keyboard', mainKeys);
-  renderKeyboard('nav-keyboard', navKeys);
-  renderKeyboard('numpad-keyboard', numpadKeys);
 
   // Init size, theme, effect
   initSize();

@@ -569,13 +569,6 @@ body {
   max-width: 100%;
 }
 
-.keyboard-right {
-  display: flex;
-  flex-direction: column;
-  gap: var(--wrapper-gap, 24px);
-  align-self: flex-end;
-}
-
 .keyboard {
   display: flex;
   flex-direction: column;
@@ -771,13 +764,6 @@ body {
 
 .key-spacer:hover { transform: none !important; }
 .key-spacer .key-cap { visibility: hidden; }
-
-/* ===== NAV + NUMPAD ===== */
-
-.key.key-h2 {
-  height: calc(2 * var(--key-u) + var(--key-gap));
-  min-height: calc(2 * var(--key-u) + var(--key-gap));
-}
 
 /* ===== CATEGORY LEGEND ===== */
 
